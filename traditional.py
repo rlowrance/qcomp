@@ -17,8 +17,10 @@ def mkv(n, a):
     return np.random.choice(a, size=n)
 
 
-vf = mkv(n, np.array([100.0]))
-vi = mkv(n, np.array([100]))
+#vf = mkv(n, np.array([100.0]))  ##I think this should be 100 * np.random.random_sample(n)
+vf = 100 * np.random.random_sample(n)
+#vi = mkv(n, np.array([100]))  ##similarly random.random_integers(0, 100, n)
+vi = np.random.random_integers(0, 100, n)
 vs = mkv(n, np.array(['hp', 'ibm', 'cs', 'appl']))
 vb = mkv(n, np.array([0, 1]))
 if debug:
@@ -70,6 +72,7 @@ def find_inst_of_first_bool():
 
 def ct_of_each_element_int():
     # TODO: determine exactly what does the q code creates
+    # RESPONSE: creates a dictionary(map) where key is an item and value is # of times it appeared in the original vector
     pass
 
 
@@ -128,12 +131,16 @@ def pairwise_corr():
     pass
 
 
-def time_all():
+
+def time_all(file_handle=None):
     n_reps = 1000
     print 'average times determined by %d function calls' % n_reps
     format_header = '%30s %15s'
     format_data = '%30s %f'
     print format_header % ('call', 'avg sec per call')
+    
+    if file_handle:
+        file_handle.write("call, seconds\n")
 
     def time_one(test_name):
         # MAYBE: get rid of the function call, if the q code does not have it
@@ -141,6 +148,8 @@ def time_all():
         setup = 'from __main__ import %s' % test_name
         total_secs = timeit.timeit(stmt=stmt, setup=setup, number=n_reps)
         print format_data % (test_name, total_secs / n_reps)
+        if file_handle:
+            file_handle.write("%s,%f\n" % (test_name, total_secs / n_reps))
 
     time_one('avg_float')
     time_one('avg_int')
@@ -153,7 +162,11 @@ def time_all():
     time_one('find_inst_of_first_bool')
     # TODO: add other tests (once they are written)
 
-time_all()
+results = open("python_results.csv","w")
+time_all(results)
+results.close()
+
+
 
 
 if False:
