@@ -6,6 +6,8 @@ import timeit
 from Bunch import Bunch  # class to mimic C structs
 
 
+# create test data
+
 debug = False
 n = 10 if debug else 1e6
 
@@ -26,19 +28,59 @@ if debug:
     print 'vb', vb[:10]
 all = [vf, vi, vs, vb]
 
-tests = {}
+
+# define each test; which must be a function of no arguments
 
 
-def avg():
-    tests['avg'] = [np.mean(vf), np.mean(vi), np.mean(vb)]
+def avg_float():
+    np.mean(vf)
 
 
-def max():
-    tests['max'] = [np.max(vf), np.max(vi), np.max(vb)]
+def avg_int():
+    np.mean(vi)
 
 
-def find_inst_of_first():
-    tests['find_inst_of_first'] = [vf[0] == vf, vi[0] == vi, vb[0] == vb]
+def avg_bool():
+    np.mean(vb)
+
+
+def max_float():
+    np.max(vf)
+
+
+def max_int():
+    np.max(vi)
+
+
+def max_bool():
+    np.max(vb)
+
+
+def find_inst_of_first_float():
+    vf[0] == vf
+
+
+def find_inst_of_first_int():
+    vi[0] == vi
+
+
+def find_inst_of_first_bool():
+    vb[0] == vb
+
+
+def ct_of_each_element_int():
+    # TODO: determine exactly what does the q code creates
+    pass
+
+
+def ct_of_each_element_bool():
+    # TODO: determine exactly what does the q code creates
+    pass
+
+
+def ct_of_each_element_sym():
+    # TODO: determine exactly what does the q code creates
+    pass
 
 
 def map_of_inst_using_group():
@@ -88,22 +130,28 @@ def pairwise_corr():
 
 def time_all():
     n_reps = 1000
+    print 'average times determined by %d function calls' % n_reps
+    format_header = '%30s %15s'
+    format_data = '%30s %f'
+    print format_header % ('call', 'avg sec per call')
 
-    def time_one(tag):
-        stmt = '%s()' % tag
-        setup = 'from __main__ import %s' % tag
+    def time_one(test_name):
+        # MAYBE: get rid of the function call, if the q code does not have it
+        stmt = '%s()' % test_name
+        setup = 'from __main__ import %s' % test_name
         total_secs = timeit.timeit(stmt=stmt, setup=setup, number=n_reps)
-        print '%s took %f seconds per call' % (tag, total_secs / n_reps)
+        print format_data % (test_name, total_secs / n_reps)
 
-    time_one('avg')
-    time_one('max')
-    time_one('find_inst_of_first')
-    time_one('map_of_inst_using_group')
-    time_one('map_of_inst_using_homebrew')
-    time_one('ct_by_sym')
-    time_one('avg_px_by_sym_by_date')
-    time_one('max_profit_by_sym')
-    time_one('pairwise_corr')
+    time_one('avg_float')
+    time_one('avg_int')
+    time_one('avg_bool')
+    time_one('max_float')
+    time_one('max_int')
+    time_one('max_bool')
+    time_one('find_inst_of_first_float')
+    time_one('find_inst_of_first_int')
+    time_one('find_inst_of_first_bool')
+    # TODO: add other tests (once they are written)
 
 time_all()
 
