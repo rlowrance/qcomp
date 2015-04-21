@@ -1,3 +1,4 @@
+import collections
 import numpy as np
 import pdb
 import timeit
@@ -10,6 +11,7 @@ from Bunch import Bunch  # class to mimic C structs
 
 debug = False
 n = 10 if debug else 1e6
+print 'number of elements in each vector', n
 
 
 def mkv(n, a):
@@ -57,30 +59,39 @@ def max_bool():
 
 
 def find_inst_of_first_float():
-    vf[0] == vf
+    vf[vf[0] == vf]
 
 
 def find_inst_of_first_int():
-    vi[0] == vi
+    vi[vi[0] == vi]
 
 
 def find_inst_of_first_bool():
-    vb[0] == vb
+    vb[vb[0] == vb]
 
 
 def ct_of_each_element_int():
-    # TODO: determine exactly what does the q code creates
-    pass
+    # returns dictionary with counts for each item
+    result = collections.Counter()
+    for i in xrange(vi.size):
+        result[vi[i]] += 1
+    return result
 
 
 def ct_of_each_element_bool():
-    # TODO: determine exactly what does the q code creates
-    pass
+    # returns dictionary with counts for each item
+    result = collections.Counter()
+    for i in xrange(vb.size):
+        result[vb[i]] += 1
+    return result
 
 
 def ct_of_each_element_sym():
-    # TODO: determine exactly what does the q code creates
-    pass
+    # returns dictionary with counts for each item
+    result = collections.Counter()
+    for i in xrange(vsym.size):
+        result[vsym[i]] += 1
+    return result
 
 
 def map_of_inst_using_group():
@@ -130,6 +141,7 @@ def pairwise_corr():
 
 def time_all():
     n_reps = 1000
+    n_reps = 1
     print 'average times determined by %d function calls' % n_reps
     format_header = '%30s %15s'
     format_data = '%30s %f'
@@ -151,6 +163,7 @@ def time_all():
     time_one('find_inst_of_first_float')
     time_one('find_inst_of_first_int')
     time_one('find_inst_of_first_bool')
+    time_one('ct_of_each_element_int')
     # TODO: add other tests (once they are written)
 
 time_all()
