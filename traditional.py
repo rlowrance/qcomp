@@ -89,8 +89,8 @@ def ct_of_each_element_bool():
 def ct_of_each_element_sym():
     # returns dictionary with counts for each item
     result = collections.Counter()
-    for i in xrange(vsym.size):
-        result[vsym[i]] += 1
+    for i in xrange(vs.size):
+        result[vs[i]] += 1
     return result
 
 
@@ -164,6 +164,7 @@ def time_all():
     time_one('find_inst_of_first_int')
     time_one('find_inst_of_first_bool')
     time_one('ct_of_each_element_int')
+    time_one('ct_of_each_element_sym')
     # TODO: add other tests (once they are written)
 
 time_all()
