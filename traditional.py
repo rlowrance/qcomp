@@ -19,9 +19,7 @@ def mkv(n, a):
     return np.random.choice(a, size=n)
 
 
-#vf = mkv(n, np.array([100.0]))  ##I think this should be 100 * np.random.random_sample(n)
 vf = 100 * np.random.random_sample(n)
-#vi = mkv(n, np.array([100]))  ##similarly random.random_integers(0, 100, n)
 vi = np.random.random_integers(0, 100, n)
 vs = mkv(n, np.array(['hp', 'ibm', 'cs', 'appl']))
 vb = mkv(n, np.array([0, 1]))
@@ -141,7 +139,6 @@ def pairwise_corr():
     pass
 
 
-
 def time_all(file_handle=None):
     n_reps = 1000
     n_reps = 1
@@ -175,12 +172,9 @@ def time_all(file_handle=None):
     time_one('ct_of_each_element_sym')
     # TODO: add other tests (once they are written)
 
-results = open("python_results.csv","w")
+results = open("python_results.csv", "w")
 time_all(results)
 results.close()
-
-
-
 
 if False:
     pdb.set_trace()  # avoid warning from pylint
