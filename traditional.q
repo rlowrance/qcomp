@@ -3,22 +3,26 @@
 \
 
 
+//Globals
+NREPS:1000
+TIMEDENOM:1e9
+
 // Utilities
-tests:([name:`$()] fun:()); //test name and lambda to run
-timeit:{ct:.z.P; r:x[]; %[;1e6] .z.P-ct} //timer function
-nreps:1000
-timeall:{update time:avg each timeit/[nreps;] each fun from `tests} //run the tests, nreps each time, avg time stored
+tests:([name:`$()] fun:(); time:()); 
+timeit0:{[x] ct:.z.P; r:x[]; (.z.P-ct)%TIMEDENOM} //returns tuple of time and result
+timeit:{show x; avg (NREPS#timeit0)@\:x} //avg of NREPS time and result of last iteration
+timeall:{update time:timeit each fun from `tests} //run the tests, nreps each time, avg time stored
 mkv:{x?y} //random vector of length x from y
 mktbl:{flip (`$"c",/:string til count x)!x} //add headers to matrix and flip to make table
-register:{`tests upsert (x;y)} //register a new test
+register:{`tests upsert `name`fun!(x;y)} //register a new test
 //set our seed for prng
 
 \S 1 
 
 n:`int$1e6 //1 mm elements in our vectors
-vf:mkv[n;100.] //vector of floats
-vi:mkv[n;100] //vector of ints
-vsyms:mkv[n;`hp`ibm`cs`aapl] //vector of symbols
+vf:mkv[n;100.] //vector of floats between 0 and 100.
+vi:mkv[n;100] //vector of ints between 0 and 100
+vsyms:mkv[n;`hp`ibm`cs`aapl] //vector of symbols drawn from list
 vb:mkv[n;10b] //vector of booleans 
 
 //register averages to test suite
@@ -32,16 +36,22 @@ register[`max_int;  {max vi}]
 register[`max_bool; {max vb}]
 
 //all values equal to first element in vector
-register[`find_inst_of_first_float;{vf where vf=first vf}]
-register[`find_inst_of_first_int;  {vi where vi=first vi}]
-register[`find_inst_of_first_bool; {vb where vb=first vb}]
-register[`find_inst_of_first_sym;  {vsyms where vsyms=first vsyms}]
+register[`find_inst_of_first_float;{vf=first vf}]
+register[`find_inst_of_first_int;  {vi=first vi}]
+register[`find_inst_of_first_bool; {vb=first vb}]
+//register[`find_inst_of_first_sym;  {vsyms=first vsyms}]
+
+
 
 
 //return count of each element in vector
-register[`ct_of_each_elem_int; {count each group vi}]
-register[`ct_of_each_elem_bool;{count each group vb}]
-register[`ct_of_each_elem_sym; {count each group vsyms}]
+//register[`ct_of_each_elem_int; {count each group vi}]
+//register[`ct_of_each_elem_bool;{count each group vb}]
+//register[`ct_of_each_elem_sym; {count each group vsyms}]
+
+timeall[];
+`:q_results.csv 0:csv 0:select call:name, seconds:time from tests
+
 
 //create map from unique elements in vector to indices of that element (e.g. 1 1 2 3 -> {1:(0,1), 2:(2), 3:(3)}
 //`tests upsert/:(`$"map_of_inst_using_group_",/:string `int`bool`sym),'{[x;y] group x}@/:(vi;vb;vsyms) //uses built-in group
@@ -51,7 +61,7 @@ register[`ct_of_each_elem_sym; {count each group vsyms}]
 //find length of longest consecutive increases, return starting and ending index
 //(akin to looking for bull run in a price series) 
 //Treat first element in vector as an increase (to stay consistent with q's deltas built-in)
-register[`longest_bull_run;{m,enlist (first;last)@\:ix s?m:max s:sum each d ix:(where differ d:0<deltas vf) cut til count vf}]
+//register[`longest_bull_run;{m,enlist (first;last)@\:ix s?m:max s:sum each d ix:(where differ d:0<deltas vf) cut til count vf}]
 /
     line by line commented below (we avoid this in actual implementation to avoid creating temporaries
     rawix:til count vf //create a vector of indices for the float vector [0...len(vf)]
@@ -66,7 +76,7 @@ register[`longest_bull_run;{m,enlist (first;last)@\:ix s?m:max s:sum each d ix:(
     return longestbull,startend
 \
 
-
+/
 
 //Create a table of syms, ints, and floats
 t:([] ticker:vsyms; date:vi; px:vf);

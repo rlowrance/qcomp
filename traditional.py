@@ -19,8 +19,10 @@ def mkv(n, a):
     return np.random.choice(a, size=n)
 
 
-vf = mkv(n, np.array([100.0]))
-vi = mkv(n, np.array([100]))
+#vf = mkv(n, np.array([100.0]))  ##I think this should be 100 * np.random.random_sample(n)
+vf = 100 * np.random.random_sample(n)
+#vi = mkv(n, np.array([100]))  ##similarly random.random_integers(0, 100, n)
+vi = np.random.random_integers(0, 100, n)
 vs = mkv(n, np.array(['hp', 'ibm', 'cs', 'appl']))
 vb = mkv(n, np.array([0, 1]))
 if debug:
@@ -139,7 +141,8 @@ def pairwise_corr():
     pass
 
 
-def time_all():
+
+def time_all(file_handle=None):
     n_reps = 1000
     n_reps = 1
     print 'average times determined by %d function calls' % n_reps
@@ -147,12 +150,17 @@ def time_all():
     format_data = '%30s %f'
     print format_header % ('call', 'avg sec per call')
 
+    if file_handle:
+        file_handle.write("call, seconds\n")
+
     def time_one(test_name):
         # MAYBE: get rid of the function call, if the q code does not have it
         stmt = '%s()' % test_name
         setup = 'from __main__ import %s' % test_name
         total_secs = timeit.timeit(stmt=stmt, setup=setup, number=n_reps)
         print format_data % (test_name, total_secs / n_reps)
+        if file_handle:
+            file_handle.write("%s,%f\n" % (test_name, total_secs / n_reps))
 
     time_one('avg_float')
     time_one('avg_int')
@@ -167,7 +175,11 @@ def time_all():
     time_one('ct_of_each_element_sym')
     # TODO: add other tests (once they are written)
 
-time_all()
+results = open("python_results.csv","w")
+time_all(results)
+results.close()
+
+
 
 
 if False:
